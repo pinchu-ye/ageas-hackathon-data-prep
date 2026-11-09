@@ -1,0 +1,6 @@
+# generator output, never committed
+dist/
+*.dbc
+*.zip
+__pycache__/
+.DS_Store
