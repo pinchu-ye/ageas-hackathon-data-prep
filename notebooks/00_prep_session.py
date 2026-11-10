@@ -205,6 +205,11 @@ except Exception as exc:
 # --- metric views, which the whole semantic layer session depends on.
 # The probe deliberately builds over a real Unity Catalog table rather than an inline query,
 # because that is the pattern the hackathon actually uses.
+#
+# Keyed `dimensions:` and not `fields:`, matching notebook 01. `fields:` is the newer
+# spelling and an older runtime rejects it outright with `Unrecognized field "fields"`, so a
+# probe written that way reports the runtime as broken when the only thing wrong is the
+# probe. That is exactly what happened in the Ageas sandbox on 10 November.
 probe_tbl = f"{CATALOG}.{SCHEMA}._prep_probe_table"
 probe_mv = f"{CATALOG}.{SCHEMA}._prep_probe_metric_view"
 try:
@@ -214,7 +219,7 @@ try:
         WITH METRICS LANGUAGE YAML AS $$
         version: 1.1
         source: {probe_tbl}
-        fields:
+        dimensions:
           - name: Group
             expr: source.grp
         measures:
