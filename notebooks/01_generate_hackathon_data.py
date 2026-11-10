@@ -1254,6 +1254,12 @@ else:
 # MAGIC
 # MAGIC Metric views need Databricks Runtime 16.4 or above to create and 17.3 or above for the
 # MAGIC full feature set. If this cell fails on version, the rest of the dataset is unaffected.
+# MAGIC
+# MAGIC The dimension block is keyed `dimensions:` and not `fields:`. `fields:` is the newer
+# MAGIC and otherwise preferred spelling, but an older runtime rejects it outright with
+# MAGIC `Unrecognized field "fields"` and creates nothing. `dimensions:` is accepted by both,
+# MAGIC which is what matters when we do not control the customer's runtime. Verified on
+# MAGIC 10 November 2026 after it failed in the Ageas sandbox.
 
 # COMMAND ----------
 
@@ -1284,7 +1290,7 @@ joins:
       FROM {CATALOG}.{SCHEMA}.fact_claim
       GROUP BY policy_id
     'on': source.policy_id = claims.policy_id
-fields:
+dimensions:
   - name: Policy start month
     expr: DATE_TRUNC('MONTH', source.policy_start_date)
     comment: Month cover started. Use this for new business and written premium periods.
@@ -1361,7 +1367,7 @@ joins:
   - name: product
     source: {CATALOG}.{SCHEMA}.dim_product
     'on': source.product_code = product.product_code
-fields:
+dimensions:
   - name: Quote month
     expr: DATE_TRUNC('MONTH', source.quote_date)
     comment: Month the quote was produced. The only date on this metric view.
@@ -1423,7 +1429,7 @@ joins:
   - name: product
     source: {CATALOG}.{SCHEMA}.dim_product
     'on': source.product_code = product.product_code
-fields:
+dimensions:
   - name: Received month
     expr: DATE_TRUNC('MONTH', source.received_date)
     comment: Month the complaint was received. Use this for complaint volumes.
